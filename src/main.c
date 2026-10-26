@@ -2,11 +2,12 @@
 #include <stdio.h>
 
 int main(void) {
-    uint8_t program[] = {1, 3, 3, 1, 1, 4, 9, 8, 11, 7, 2, 0};
+    uint8_t program[] = {1, 5, 10, 0, 11, 0, 3, 11, 0, 11, 0, 2, 3, 0};
     int pc = 0;
     int stack[256]; // stack[0]が一番下　staxk[sp-1]が一番上
     int sp = 0;     // stack pointer 空
     int running = 1;
+    int vars[16] = {0}; // 変数用の配列
 
     while (running) {
         uint8_t op = program[pc];
@@ -93,6 +94,21 @@ int main(void) {
             }
             stack[sp] = stack[sp - 1];
             sp++;
+            break;
+        case 10: // store
+            if (sp < 1) {
+                printf("error: stack underflow\n");
+                running = 0;
+                break;
+            }
+            sp--;
+            vars[program[pc]] = stack[sp];
+            pc++;
+            break;
+        case 11: // load
+            stack[sp] = vars[program[pc]];
+            sp++;
+            pc++;
             break;
         }
     }
